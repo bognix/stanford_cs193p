@@ -10,20 +10,29 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiMemoryGame
 
-    
-    var body: some View { // this variable always reflects the state of the Model. The only way to write on the screen.
+    // this variable always reflects the state of the Model. The only way to write on the screen.
+    var body: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
+            Text(viewModel.themeName)
+            
+            Text("Your score: \(viewModel.score)")
+            
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
     //                each element in array has to be identifiable in order to use it in the ForEach. We used small hack with \.self
                 ForEach(viewModel.cards) { card in
-                    CardView(card: card)
+                    CardView(card: card, themeColor: viewModel.themeColor)
                         .aspectRatio(2/3, contentMode: .fit)
                         .onTapGesture {
                             viewModel.choose(card)
                         }
                 }
             }
-            .foregroundColor(.orange)
+            
+            Button(action: {
+                viewModel.newGame()
+            }, label: {
+                Text("New Game")
+            })
         }
         .font(.largeTitle)
         .padding(.horizontal)
@@ -32,6 +41,7 @@ struct ContentView: View {
 
 struct CardView: View {
     let card: MemoryGame<String>.Card
+    let themeColor: Color
     
     var body: some View {
 //        ZStack accepts the content argument which is a function. We can skip the name of the argument
@@ -45,7 +55,7 @@ struct CardView: View {
             } else if card.isMatched {
                 shape.opacity(0)
             } else {
-                shape.fill().foregroundColor(.blue)
+                shape.fill().foregroundColor(themeColor)
             }
         }
     }
